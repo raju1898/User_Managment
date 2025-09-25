@@ -14,35 +14,18 @@ public class UserAuthenticationResponce {
 	  @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String token;
-	
-	
-	
-	
 	public UserAuthenticationResponce() {
 		super();
 	}
-
-
-
-
 	public UserAuthenticationResponce(String token) {
 		super();
 		this.token = token;
 	}
-
-
-
-
 	public String getToken() {
 		return token;
 	}
 
-
-
-
 	public void setToken(String token) {
 		this.token = token;
 	}
-	
-
 }
