@@ -10,7 +10,8 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {
 	    "com.SpringSecurtiyOwn.SpringSecurtiyOwnController",
 	    "com.SpringSecurtiyOwn.SpringSecurtiyOwnService",
-	    " com.SpringSecurtiyOwn.SpringSecurtiyOwnSecurityConfig"
+	    " com.SpringSecurtiyOwn.SpringSecurtiyOwnSecurityConfig",
+	     "com.SpringSecurtiyOwn.SpringSecurtiyOwnJwtHelper"
 	})
 
 public class SpringSecurtiyOwnApplication {

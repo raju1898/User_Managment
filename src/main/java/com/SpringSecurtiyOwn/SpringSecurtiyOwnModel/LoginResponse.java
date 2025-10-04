@@ -4,6 +4,7 @@ public class LoginResponse {
 	
 	private String username;
 	private String passowrd;
+	private String token;
 	
 	
 	public LoginResponse() {
@@ -11,12 +12,14 @@ public class LoginResponse {
 	}
 
 
-	public LoginResponse(String username, String passowrd) {
+	
+
+	public LoginResponse(String username, String passowrd, String token) {
 		super();
 		this.username = username;
 		this.passowrd = passowrd;
+		this.token = token;
 	}
-
 
 	public String getUsername() {
 		return username;
@@ -35,6 +38,20 @@ public class LoginResponse {
 
 	public void setPassowrd(String passowrd) {
 		this.passowrd = passowrd;
+	}
+
+
+
+
+	public String getToken() {
+		return token;
+	}
+
+
+
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 	
 	

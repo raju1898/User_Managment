@@ -12,6 +12,7 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import com.SpringSecurtiyOwn.SpringSecurtiyOwnModel.UserDetailsImpl;
 
@@ -22,14 +23,16 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 
+@Component
 public class JwtHelper {
+
 	private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
 	private static final int Miutes = 60;
-
-	@Value("${app.jwtSecret}")
+	
+	@Value("${jwt.secret}")
 	private String jwtSecret;
-	@Value("${app.jwtExpirationMs}")
+	 @Value("${jwt.expiration}")
 	private int jwtExpirationMs;
 
 	public static String generateToken(String email) {

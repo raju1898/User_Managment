@@ -5,26 +5,34 @@ import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
 
 import com.SpringSecurtiyOwn.SpringSecurtiyOwnJwtHelper.JwtHelper;
 import com.SpringSecurtiyOwn.SpringSecurtiyOwnModel.LoginResponse;
 import com.SpringSecurtiyOwn.SpringSecurtiyOwnModel.RefreshToken;
+import com.SpringSecurtiyOwn.SpringSecurtiyOwnModel.SignupRequest;
 import com.SpringSecurtiyOwn.SpringSecurtiyOwnModel.TokenRefreshResponse;
+import com.SpringSecurtiyOwn.SpringSecurtiyOwnModel.User;
 import com.SpringSecurtiyOwn.SpringSecurtiyOwnModel.UserAuthenticatioinR;
 import com.SpringSecurtiyOwn.SpringSecurtiyOwnModel.UserDetailsImpl;
 import com.SpringSecurtiyOwn.SpringSecurtiyOwnService.CustomUserDetailsService;
 import com.SpringSecurtiyOwn.SpringSecurtiyOwnService.RefreshTokenService;
-import com.SpringSecurtiyOwn.SpringSecurtiyOwnModel.User;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000", methods = { RequestMethod.GET, RequestMethod.POST })
 @RequestMapping("/auth")
+
 public class AuthController {
 
 	@Autowired
@@ -43,26 +51,38 @@ public class AuthController {
 		this.userDetailsService = userDetailsService;
 	}
 
-	@PostMapping(value = "/login")
-	public ResponseEntity<LoginResponse> login(@RequestBody UserAuthenticatioinR userAuthenticatioinR) {
-		System.out.println("method called");
-		org.springframework.security.core.Authentication auth = authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(userAuthenticatioinR.getUsername(),
-						userAuthenticatioinR.getPassword()));
-		if (auth.isAuthenticated()) {
-			String token = JwtHelper.generateToken(userAuthenticatioinR.getUsername());
-			UserDetails user = userDetailsService.loadUserByUsername(userAuthenticatioinR.getUsername());
-			System.out.println("userrrrrrrrr" + user);
-			return ResponseEntity.ok(new LoginResponse(token, userAuthenticatioinR.getUsername()));
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody UserAuthenticatioinR userAuthenticatioinR) {
+		try {
+			Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+					userAuthenticatioinR.getUserName(), userAuthenticatioinR.getPassword()));
 
+			if (auth.isAuthenticated()) {
+				userDetailsService.resetFailedAttempts(userAuthenticatioinR.getUserName());
+				String token = jwtHelper.generateToken(userAuthenticatioinR.getUserName());
+				return ResponseEntity.ok(new LoginResponse(userAuthenticatioinR.getUserName(), null, token));
+			} else {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
+			}
+
+		} catch (BadCredentialsException e) {
+			userDetailsService.increaseFailedAttempts(userAuthenticatioinR.getUserName());
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+
+		} catch (LockedException e) {
+			System.out.println(e.getMessage() + "getMessagegetMessage");
+			return ResponseEntity.status(HttpStatus.LOCKED).body(e.getMessage());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
-		return null;
 	}
 
 	@PostMapping(value = "/signup")
-	public ResponseEntity<Void> signUp(@RequestBody User user) {
-		System.out.println("method called=============" + user);
-		userDetailsService.addUser(user);
+	public ResponseEntity<Void> signUp(@RequestBody SignupRequest signupRequest) {
+
+		userDetailsService.addUser(signupRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
