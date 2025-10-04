@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 import com.SpringSecurtiyOwn.SpringSecurtiyOwnModel.User;
 
 @Entity
-@Table(name = "/refresh_tokens")
+@Table(name = "refresh_tokens")
 public class RefreshToken {
 
 	@Id
